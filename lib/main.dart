@@ -133,12 +133,20 @@ class LeenaGame extends FlameGame with HasCollisionDetection, TapDetector {
       ..size = Vector2.all(50);
 
     add(leftButton);
+
     SpriteComponent rightButton = SpriteComponent()
       ..sprite = await loadSprite('right.png')
       ..position = Vector2(camera.canvasSize.x - 25, camera.canvasSize.y - 25)
       ..size = Vector2.all(50);
 
     add(rightButton);
+
+    SpriteComponent upButton = SpriteComponent()
+      ..sprite = await loadSprite('up.png')
+      ..position = Vector2(camera.canvasSize.x - 75, camera.canvasSize.y - 90)
+      ..size = Vector2.all(50);
+
+    add(upButton);
 
     dadSprite = await loadSprite('dad.png');
     intro = new Intro(size: size);
@@ -162,21 +170,14 @@ class LeenaGame extends FlameGame with HasCollisionDetection, TapDetector {
   @override
   void onTapDown(TapDownInfo info) {
     super.onTapDown(info);
-
-    if (info.eventPosition.viewport.x < camera.canvasSize.x / 2) {
-      print('left');
-    } else {
-      print('right');
-    }
     if (!introFinished) {
       introFinished = true;
       remove(intro);
       overlays.notifyListeners();
     }
     if (leena.onGround && introFinished) {
-      if (info.eventPosition.viewport.x < 100) {
-        timerStarted = true;
-        print('push left');
+      if (info.eventPosition.viewport.x < camera.canvasSize.x - 25) {
+        print('moveLeft');
         if (leena.facingRight) {
           leena.flipHorizontallyAroundCenter();
           leena.facingRight = false;
@@ -191,9 +192,8 @@ class LeenaGame extends FlameGame with HasCollisionDetection, TapDetector {
             }
           });
         }
-      } else if (info.eventPosition.viewport.x > size[0] - 100) {
-        timerStarted = true;
-        print('push right');
+      } else if (info.eventPosition.viewport.x > camera.canvasSize.x - 25) {
+        print('moveRight');
         if (!leena.facingRight) {
           leena.facingRight = true;
           leena.flipHorizontallyAroundCenter();
@@ -208,9 +208,8 @@ class LeenaGame extends FlameGame with HasCollisionDetection, TapDetector {
             }
           });
         }
-      }
-      if (info.eventPosition.game.y < 100) {
-        print('jump up');
+      } else if (info.eventPosition.viewport.y > camera.canvasSize.y - 90) {
+        print('jump');
         leena.animation = jumpAnim;
         Future.delayed(const Duration(milliseconds: 1200), () {
           leena.animation = rideAnim;
@@ -222,5 +221,55 @@ class LeenaGame extends FlameGame with HasCollisionDetection, TapDetector {
         }
       }
     }
+
+    // if (leena.onGround && introFinished) {
+    //   if (info.eventPosition.viewport.x < 100) {
+    //     timerStarted = true;
+    //     print('push left');
+    //     if (leena.facingRight) {
+    //       leena.flipHorizontallyAroundCenter();
+    //       leena.facingRight = false;
+    //     }
+    //     if (!leena.hitLeft && remainingTime > 0) {
+    //       leena.x -= 15;
+    //       velocity.x -= pushSpeed;
+    //       leena.animation = pushAnim;
+    //       Future.delayed(const Duration(milliseconds: 1200), () {
+    //         if (leena.animation != jumpAnim) {
+    //           leena.animation = rideAnim;
+    //         }
+    //       });
+    //     }
+    //   } else if (info.eventPosition.viewport.x > size[0] - 100) {
+    //     timerStarted = true;
+    //     print('push right');
+    //     if (!leena.facingRight) {
+    //       leena.facingRight = true;
+    //       leena.flipHorizontallyAroundCenter();
+    //     }
+    //     if (!leena.hitRight && remainingTime > 0) {
+    //       leena.x += 15;
+    //       velocity.x += pushSpeed;
+    //       leena.animation = pushAnim;
+    //       Future.delayed(const Duration(milliseconds: 1200), () {
+    //         if (leena.animation != jumpAnim) {
+    //           leena.animation = rideAnim;
+    //         }
+    //       });
+    //     }
+    //   }
+    //   if (info.eventPosition.game.y < 100) {
+    //     print('jump up');
+    //     leena.animation = jumpAnim;
+    //     Future.delayed(const Duration(milliseconds: 1200), () {
+    //       leena.animation = rideAnim;
+    //     });
+    //     if (remainingTime > 0) {
+    //       leena.y -= 10;
+    //       velocity.y = -jumpForce;
+    //       leena.onGround = false;
+    //     }
+    //   }
+    // }
   }
 }
